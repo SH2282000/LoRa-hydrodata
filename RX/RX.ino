@@ -16,7 +16,7 @@ void logo(){
 void LoRaData(){
   //cli
   for(int i = 0; i < TXNB; i++)
-    Serial.println("Bain n°" + String(i+1) + " Temp: " + String(TXData[i][1]) + " RSSI: " + String(TXData[i][0]));
+    Serial.println("Bain n" + String(i+1) + " Temp: " + String(TXData[i][1]) + " RSSI:" + String(TXData[i][0]));
   Serial.println();
 
   //integrated display
@@ -25,7 +25,7 @@ void LoRaData(){
   Heltec.display->setFont(ArialMT_Plain_10);
 
   for(int i = 0; i < TXNB; i++)
-    Heltec.display->drawString(0, 15*i, "Bain n°" + String(i+1) + " Temp: " + String(TXData[i][1]) + " RSSI: " + String(TXData[i][0]));
+    Heltec.display->drawString(0, 15*i, "Bain n" + String(i+1) + " Temp: " + String(TXData[i][1]) + " RSSI:" + String(TXData[i][0]));
   Heltec.display->display();
 }
 void onReceive(int packetSize)
@@ -36,7 +36,7 @@ void onReceive(int packetSize)
   int sender = LoRa.read();            // sender address
   int incomingMsgId = LoRa.read();     // incoming msg ID
   byte incomingLength = LoRa.read();    // incoming msg length
-  int temperature = LoRa.read();    // incoming msg length
+  int temperature = LoRa.read();    // incoming temperature
  
   // attribute temperature and RSSI from the sender in the array
   TXData[sender][0] = LoRa.packetRssi(); // RSSI

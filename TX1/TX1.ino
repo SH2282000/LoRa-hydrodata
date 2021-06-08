@@ -1,9 +1,17 @@
+#include <OneWire.h>
+#include <DallasTemperature.h>
 #include "heltec.h" 
 #include "images.h"
 
+// communication
 #define BAND    433E6   // same as RX
 int localAddress = 0;
 int msgCount = 0;
+
+// temp retrieving
+#define ONE_WIRE_BUS 36
+OneWire oneWire(ONE_WIRE_BUS); 
+DallasTemperature sensors(&oneWire); 
 
 void logo(){
   Heltec.display->clear();
@@ -35,8 +43,8 @@ void send(int temperature)
 
 int getTemperature()
 {
-  //
-  return random(100);
+  sensors.requestTemperatures();  
+  return sensors.getTempCByIndex(0);
 }
 
 void setup() { 
