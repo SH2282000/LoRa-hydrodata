@@ -9,7 +9,7 @@ int localAddress = 0;
 int msgCount = 0;
 
 // temp retrieving
-#define ONE_WIRE_BUS 36
+#define ONE_WIRE_BUS 32  
 OneWire oneWire(ONE_WIRE_BUS); 
 DallasTemperature sensors(&oneWire); 
 

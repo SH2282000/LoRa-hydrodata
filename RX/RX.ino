@@ -1,6 +1,17 @@
 #include "heltec.h" 
 #include "images.h"                             // image imported in an hex array
+#include <SPI.h>
+#include <WiFi.h>
 
+// WiFi
+char ssid[] = "Livebox-86B0"; //  your network SSID (name)
+char pass[] = "aJTnxm6TPUWRvLWczV";    // your network password (use for WPA, or use as key for WEP)
+
+int status = WL_IDLE_STATUS;
+char server[] = "www.teamrotor.com";
+WiFiClient client;
+
+//LoRa
 #define BAND    433E6                           // other available frequncies: 868E6,915E6
 #define TXNB    4                               // number of TX
 int TXData[TXNB][2] = {0};                     // 0: RSSI, 1: temperature
@@ -27,6 +38,18 @@ void LoRaData(){
   for(int i = 0; i < TXNB; i++)
     Heltec.display->drawString(0, 15*i, "Bain n" + String(i+1) + " Temp: " + String(TXData[i][1]) + " RSSI:" + String(TXData[i][0]));
   Heltec.display->display();
+
+  //send by WiFi
+  if (client.connect(server, 80)) {
+    Serial.println("connected to server");
+  
+    // Make a HTTP request:
+    client.println("GET /temperature?"+String(abs(TXData[0][1]), DEC)+"&"+String(abs(TXData[1][1]), DEC)+"&"+String(abs(TXData[2][1]), DEC)+"&"+String(abs(TXData[3][1]), DEC)+" HTTP/1.1");
+    Serial.println("GET /temperature?"+String(TXData[0][1], DEC)+"&"+String(TXData[1][1], DEC)+"&"+String(TXData[2][1], DEC)+"&"+String(TXData[3][1], DEC)+" HTTP/1.1");
+    client.println("Host: www.teamrotor.com");
+    client.println("Connection: close");
+    client.println();
+  }
 }
 void onReceive(int packetSize)
 {
@@ -80,9 +103,21 @@ void setup() {
   
   Heltec.display->drawString(0, 10, "Wait for incoming data...");
   Heltec.display->display();
-  delay(1000);
+  delay(5000);
   LoRa.receive();
+
+  // WiFi
+  while (status != WL_CONNECTED) {
+    Serial.print("Attempting to connect to SSID: ");
+    Serial.println(ssid);
+    // Connect to WPA/WPA2 network. Change this line if using open or WEP network:
+    status = WiFi.begin(ssid, pass);
+    // wait 10 seconds for connection:
+    delay(2000);
+  }
+  Serial.println("Connected !");
 }
 void loop() {
-  onReceive(LoRa.parsePacket());  
+  onReceive(LoRa.parsePacket()); 
+  delay(2000); 
 }
